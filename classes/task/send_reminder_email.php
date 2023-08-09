@@ -70,6 +70,15 @@ class send_reminder_email extends \core\task\scheduled_task {
                     continue;
                 }
             }
+
+            // Fix #10 - Skip courses with no students.
+            $coursecon = \context_course::instance($courseid);
+            $enrolledstudents = count_enrolled_users($coursecon, 'mod/assign:submit');
+            if ($enrolledstudents == 0) {
+                mtrace("Skipping course $course->shortname because it has no students.");
+                continue;
+            }
+
             $syllabi = get_all_instances_in_course('syllabus', $course, null, true);
 
             if (count($syllabi) == 0 && $course->startdate < $now && $course->enddate > $now) {
@@ -77,7 +86,6 @@ class send_reminder_email extends \core\task\scheduled_task {
                 if ($course->visible || (!$course->visible && $tohidden)) {
 
                     // Get instructor(s) to notify.
-                    $coursecon = \context_course::instance($course->id);
                     $teachers = get_users_by_capability($coursecon, 'moodle/backup:backupcourse', 'u.id');
 
                     foreach ($teachers as $teacher) {
