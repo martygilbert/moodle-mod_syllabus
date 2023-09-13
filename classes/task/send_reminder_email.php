@@ -129,7 +129,9 @@ class send_reminder_email extends \core\task\scheduled_task {
                             $coursestoprocess[$teacher->id][$course->shortname]['name'] = $course->fullname;
                             $coursestoprocess[$teacher->id][$course->shortname]['url'] = (string)
                                 new \moodle_url('/course/view.php', array('id' => $course->id));
-                        }
+                        } else {
+                    		mtrace("Skipping course $course->shortname because course is not visible to teacher.");
+						}
                     }
                 }
             }
@@ -164,8 +166,11 @@ class send_reminder_email extends \core\task\scheduled_task {
 
         $admin = get_admin();
 
-        email_to_user($teacher, $admin,
+        $result = email_to_user($teacher, $admin,
             get_string('emailsubj', 'mod_syllabus') . ' - ' . $datestr . ' - ' . $teacher->username, html_to_text($msg), $msg);
+		if (!$result) {
+			mtrace("Error emailing $teacher->firstname $teacher->lastname");
+		}
     }
 
 }
