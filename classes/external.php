@@ -156,7 +156,7 @@ class mod_syllabus_external extends external_api {
             $syllabi = get_all_instances_in_courses("syllabus", $courses);
             foreach ($syllabi as $syllabus) {
                 $context = context_module::instance($syllabus->coursemodule);
-                
+
                 helper_for_get_mods_by_courses::format_name_and_intro($syllabus, 'mod_syllabus');
                 $syllabus->contentfiles = external_util::get_area_files($context->id, 'mod_syllabus', 'content');
 

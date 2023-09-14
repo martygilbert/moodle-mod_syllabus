@@ -15,15 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Mobile output class for mod_syllabus
  * @package    mod_syllabus
  * @copyright  2021 Marty Gilbert <martygilbert@gmail>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_syllabus\output;
-
-defined('MOODLE_INTERNAL') || die;
-
 
 use context_module;
 use mod_syllabus_external;
@@ -36,8 +34,14 @@ use mod_syllabus_external;
  */
 class mobile {
 
+    /**
+     * Returns the syllabus course view for the mobile app.
+     *
+     * @param mixed $args
+     * @return array HTML, javascript and other data.
+     */
     public static function mobile_syllabus_view($args) {
-        global $OUTPUT, $USER, $DB;
+        global $OUTPUT;
 
         $args = (object) $args;
         $cm = get_coursemodule_from_id('syllabus', $args->cmid);
@@ -84,5 +88,4 @@ class mobile {
             'files' => '',
         ];
     }
-
 }

@@ -23,8 +23,6 @@
  */
 namespace mod_syllabus\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The mod_syllabus module does not store any data.
  *

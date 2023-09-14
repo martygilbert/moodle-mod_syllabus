@@ -34,7 +34,7 @@ namespace mod_syllabus;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 4.10
  */
-class task_test extends \advanced_testcase {
+class reminder_email_test extends \advanced_testcase {
 
     /**
      * @var \phpunit_message_sink
@@ -48,6 +48,7 @@ class task_test extends \advanced_testcase {
 
 
     /**
+     * Setup the tests.
      * @return void
      */
     public function setUp(): void {
@@ -76,6 +77,7 @@ class task_test extends \advanced_testcase {
     /**
      * This test will make sure that the reminder task does nothing if remindersenabled is
      * false.
+     * @covers \mod_syllabus\task\send_reminder_email
      */
     public function test_remindersendabled() {
         global $DB;
@@ -117,7 +119,7 @@ class task_test extends \advanced_testcase {
 
         // Now test with remindersenabled on.
         set_config('remindersenabled', '1', 'syllabus');
-        
+
         // Clear (?) previous message(s).
         $this->mailsink->clear();
         ob_start();
@@ -133,6 +135,7 @@ class task_test extends \advanced_testcase {
     /**
      * This test will make sure that teachers receive don't receive and email for a course
      * that has a Syllabus activity.
+     * @covers \mod_syllabus\task\send_reminder_email
      */
     public function test_reminder_syllabus_exists() {
         global $DB;
@@ -175,13 +178,13 @@ class task_test extends \advanced_testcase {
             $this->assertMatchesRegularExpression('/Test course 1/', $message->body);
         }
 
-        // Now add a Syllabus activity and retry
+        // Now add a Syllabus activity and retry.
         $options = ['course' => $course->id];
         $this->setUser($teacher);
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_syllabus');
         $syllabus = $generator->create_instance($options);
 
-        // Clear the previous messages;
+        // Clear the previous messages.
         $this->mailsink->clear();
 
         ob_start();
@@ -197,6 +200,7 @@ class task_test extends \advanced_testcase {
      * This test will make sure that teachers receive only one
      * email reminder, even if they have multiple courses across
      * multiple categories.
+     * @covers \mod_syllabus\task\send_reminder_email
      */
     public function test_reminder_email_single_email() {
         global $DB;
@@ -246,7 +250,6 @@ class task_test extends \advanced_testcase {
         // Check for the links to each course
         // Message should have the correct subject.
         foreach ($messages as $message) {
-            //print_r($message);
             $this->assertMatchesRegularExpression('/Test course 1/', $message->body);
             $this->assertMatchesRegularExpression('/Test course 2/', $message->body);
         }
@@ -255,6 +258,7 @@ class task_test extends \advanced_testcase {
     /**
      * This test will make sure that reminder emails are not sent if
      * if teacher can't view course.
+     * @covers \mod_syllabus\task\send_reminder_email
      */
     public function test_reminder_email_invisible_to_teacher() {
         global $DB;
@@ -319,6 +323,7 @@ class task_test extends \advanced_testcase {
      * This test will make sure that:
      * 1. Reminder emails are NOT sent if course hidden and not emailstohidden
      * 2. Reminder emails ARE sent if course hidden and emailstohidden
+     * @covers \mod_syllabus\task\send_reminder_email
      */
     public function test_reminder_email_emailstohidden() {
         global $DB;
@@ -384,6 +389,7 @@ class task_test extends \advanced_testcase {
      * This test will make sure that:
      * 1. Reminder emails are NOT sent if no students are enrolled
      * 2. Reminder emails ARE sent if >= 1 student is enrolled
+     * @covers \mod_syllabus\task\send_reminder_email
      */
     public function test_reminder_email_enrollment_based() {
         global $DB;

@@ -20,7 +20,6 @@ namespace mod_syllabus;
  * PHPUnit data generator testcase.
  *
  * @package    mod_syllabus
- * @category phpunit
  * @covers \mod_syllabus_generator
  * @category   external
  * @copyright  2020 Marty Gilbert <martygilbert@gmail>

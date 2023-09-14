@@ -25,9 +25,6 @@
  */
 namespace mod_syllabus;
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * Unit tests for mod_syllabus lib
  *
@@ -50,6 +47,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * Test syllabus_view
+     * @covers \syllabus::syllabus_view
      * @return void
      */
     public function test_syllabus_view() {
@@ -151,6 +149,10 @@ class lib_test extends \advanced_testcase {
         $this->assertEquals('R3', $info->name);
     }
 
+    /**
+     * Test mod_syllabus_core_calendar_provide_event_action
+     * @covers \syllabus::mod_syllabus_core_calendar_provide_event_action
+     */
     public function test_syllabus_core_calendar_provide_event_action() {
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -177,6 +179,10 @@ class lib_test extends \advanced_testcase {
         $this->assertTrue($actionevent->is_actionable());
     }
 
+    /**
+     * Test mod_syllabus_core_calendar_provide_event_action
+     * @covers \syllabus::mod_syllabus_core_calendar_provide_event_action
+     */
     public function test_syllabus_core_calendar_provide_event_action_already_completed() {
         global $CFG;
 
@@ -213,6 +219,7 @@ class lib_test extends \advanced_testcase {
 
     /**
      * Test mod_syllabus_core_calendar_provide_event_action with user override
+     * @covers \syllabus::mod_syllabus_core_calendar_provide_event_action
      */
     public function test_syllabus_core_calendar_provide_event_action_user_override() {
         global $CFG, $USER;

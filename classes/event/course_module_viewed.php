@@ -24,8 +24,6 @@
 
 namespace mod_syllabus\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The mod_syllabus course module viewed event class.
  *
@@ -47,6 +45,10 @@ class course_module_viewed extends \core\event\course_module_viewed {
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
 
+    /**
+     * Handle the objectid mapping
+     * @return array
+     */
     public static function get_objectid_mapping() {
         return array('db' => 'syllabus', 'restore' => 'syllabus');
     }

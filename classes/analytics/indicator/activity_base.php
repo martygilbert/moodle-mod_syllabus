@@ -24,8 +24,6 @@
 
 namespace mod_syllabus\analytics\indicator;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Activity base class.
  *

@@ -24,8 +24,6 @@
 
 namespace mod_syllabus\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The mod_syllabus instance deleted event class
  *

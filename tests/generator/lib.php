@@ -22,9 +22,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * Resource module data generator class.
  *
@@ -51,8 +48,6 @@ class mod_syllabus_generator extends testing_module_generator {
         require_once($CFG->dirroot . '/lib/resourcelib.php');
         // Ensure the record can be modified without affecting calling code.
         $record = (object)(array)$record;
-        //fputs(STDERR, print_r($record, true));
-        //fputs(STDERR, print_r($options, true));
 
         // Fill in optional values if not specified.
         if (!isset($record->display)) {

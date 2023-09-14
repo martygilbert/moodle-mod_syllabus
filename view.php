@@ -34,13 +34,13 @@ $forceview = optional_param('forceview', 0, PARAM_BOOL);
 
 if ($r) {
     if (!$syllabus = $DB->get_record('syllabus', array('id' => $r))) {
-        print_error('invalidaccessparameter');
+        throw new \moodle_exception('invalidaccessparameter');
     }
     $cm = get_coursemodule_from_instance('syllabus', $syllabus->id, $syllabus->course, false, MUST_EXIST);
 
 } else {
     if (!$cm = get_coursemodule_from_id('syllabus', $id)) {
-        print_error('invalidcoursemodule');
+        throw new \moodle_exception('invalidcoursemodule');
     }
     $syllabus = $DB->get_record('syllabus', array('id' => $cm->instance), '*', MUST_EXIST);
 }

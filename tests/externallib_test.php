@@ -38,6 +38,7 @@ class externallib_test extends externallib_advanced_testcase {
 
     /**
      * Test view_syllabus
+     * @covers \mod_syllabus_external::view_syllabus
      */
     public function test_view_syllabus() {
         global $DB;
@@ -109,6 +110,7 @@ class externallib_test extends externallib_advanced_testcase {
 
     /**
      * Test test_mod_syllabus_get_syllabus_by_courses
+     * @covers \mod_syllabus_external::get_syllabus_by_courses
      */
     public function test_mod_syllabus_get_syllabus_by_courses() {
         global $DB;
