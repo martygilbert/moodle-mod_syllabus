@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Restore steps for mod_syllabus
  * @package    mod_syllabus
  * @subpackage backup-moodle2
  * @copyright 2021 Marty Gilbert <martygilbert@gmail>
@@ -30,6 +31,11 @@
  */
 class restore_syllabus_activity_structure_step extends restore_activity_structure_step {
 
+    /**
+     * Define the structure of the restore workflow.
+     *
+     * @return restore_path_element $structure
+     */
     protected function define_structure() {
 
         $paths = array();
@@ -39,11 +45,16 @@ class restore_syllabus_activity_structure_step extends restore_activity_structur
         return $this->prepare_activity_structure($paths);
     }
 
+    /**
+     * Process a syllabus restore.
+     *
+     * @param object $data The data in object form
+     * @return void
+     */
     protected function process_syllabus($data) {
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
         $data->course = $this->get_courseid();
 
         // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
@@ -55,6 +66,10 @@ class restore_syllabus_activity_structure_step extends restore_activity_structur
         $this->apply_activity_instance($newitemid);
     }
 
+    /**
+     * Once the database tables have been fully restored, restore the files
+     * @return void
+     */
     protected function after_execute() {
         // Add choice related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_syllabus', 'intro', null);

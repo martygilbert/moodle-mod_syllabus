@@ -22,17 +22,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Define the complete syllabus structure for backup, with file and id annotations
  */
 class backup_syllabus_activity_structure_step extends backup_activity_structure_step {
 
+    /**
+     * Define the structure for the syllabus activity
+     * @return void
+     */
     protected function define_structure() {
-
-        // To know if we are including userinfo.
-        $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated.
         $syllabus = new backup_nested_element('syllabus', array('id'), array(

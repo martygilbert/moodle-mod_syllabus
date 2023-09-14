@@ -28,7 +28,14 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 require_once($CFG->dirroot.'/mod/syllabus/locallib.php');
 require_once($CFG->libdir.'/filelib.php');
 
+/**
+ * Form for adding a Syllabus
+ */
 class mod_syllabus_mod_form extends moodleform_mod {
+    /**
+     * Form definition
+     * @return void
+     */
     public function definition() {
         global $CFG, $DB;
         $mform =& $this->_form;
@@ -60,7 +67,7 @@ class mod_syllabus_mod_form extends moodleform_mod {
         $mform->addElement('filemanager', 'files', get_string('selectfile', 'syllabus'), null, $fmoptions);
 
         // Add legacy files flag only if used.
-        if (isset($this->current->legacyfiles) and $this->current->legacyfiles != RESOURCELIB_LEGACYFILES_NO) {
+        if (isset($this->current->legacyfiles) && $this->current->legacyfiles != RESOURCELIB_LEGACYFILES_NO) {
             $options = array(RESOURCELIB_LEGACYFILES_DONE   => get_string('legacyfilesdone', 'syllabus'),
                              RESOURCELIB_LEGACYFILES_ACTIVE => get_string('legacyfilesactive', 'syllabus'));
             $mform->addElement('select', 'legacyfiles', get_string('legacyfiles', 'syllabus'), $options);
@@ -114,8 +121,8 @@ class mod_syllabus_mod_form extends moodleform_mod {
             $mform->setAdvanced('popupheight', true);
         }
 
-        if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) or
-          array_key_exists(RESOURCELIB_DISPLAY_EMBED, $options) or
+        if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) ||
+          array_key_exists(RESOURCELIB_DISPLAY_EMBED, $options) ||
           array_key_exists(RESOURCELIB_DISPLAY_FRAME, $options)) {
             $mform->addElement('checkbox', 'printintro', get_string('printintro', 'syllabus'));
             $mform->hideIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_POPUP);
@@ -142,8 +149,13 @@ class mod_syllabus_mod_form extends moodleform_mod {
         $mform->setDefault('revision', 1);
     }
 
+    /**
+     * Any data processing needed before the form is displayed
+     * (needed to set up draft areas for editor and filemanager elements)
+     * @param array $defaultvalues
+     */
     public function data_preprocessing(&$defaultvalues) {
-        if ($this->current->instance and !$this->current->tobemigrated) {
+        if ($this->current->instance && !$this->current->tobemigrated) {
             $draftitemid = file_get_submitted_draft_itemid('files');
             file_prepare_draft_area($draftitemid, $this->context->id, 'mod_syllabus', 'content', 0, array('subdirs' => true));
             $defaultvalues['files'] = $draftitemid;
@@ -179,8 +191,11 @@ class mod_syllabus_mod_form extends moodleform_mod {
         }
     }
 
+    /**
+     * Probably remove this later
+     */
     public function definition_after_data() {
-        if ($this->current->instance and $this->current->tobemigrated) {
+        if ($this->current->instance && $this->current->tobemigrated) {
             // Syllabus not migrated yet.
             return;
         }
@@ -188,6 +203,13 @@ class mod_syllabus_mod_form extends moodleform_mod {
         parent::definition_after_data();
     }
 
+    /**
+     * Validates the form input
+     *
+     * @param array $data submitted data
+     * @param array $files submitted files
+     * @return array eventual errors indexed by the field name
+     */
     public function validation($data, $files) {
         global $USER;
 

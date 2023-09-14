@@ -15,16 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Syllabus resource
+ * Syllabus resource - observer for course_module_updated
  *
  * @package    mod_syllabus
  * @copyright  2021 Marty Gilbert <martygilbert@gmail>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/**
+ * Event observer for mod_syllabus
+ */
 class mod_syllabus_observer {
 
+    /**
+     * Triggered via course_module_updated event
+     * @param \mod_syllabus\event\course_module_updated $event
+     */
     public static function syllabus_updated(\mod_syllabus\event\course_module_updated $event) {
+        // To be added later.
     }
 
 }

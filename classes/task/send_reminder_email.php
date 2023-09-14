@@ -17,18 +17,28 @@
 /**
  * A scheduled task for forum cron.
  *
- * @package    mod_forum
+ * @package    mod_syllabus
  * @copyright  2021 Marty Gilbert <martygilbert@gmail>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_syllabus\task;
 
+/**
+ * This class will handle sending out the reminder emails
+ */
 class send_reminder_email extends \core\task\scheduled_task {
 
+    /**
+     * Returns the name of this task
+     * @return string
+     */
     public function get_name() {
         return get_string('reminderemail', 'mod_syllabus');
     }
 
+    /**
+     * Executes the task
+     */
     public function execute() {
         $val = get_config('syllabus', 'remindersenabled');
         if (!$val) {
@@ -57,7 +67,7 @@ class send_reminder_email extends \core\task\scheduled_task {
      * All of the categories to check are listed in the config_plugins table
      * `catstocheck`. If a category no longer exists, this function will
      * remove the category id from `catstocheck` so it isn't checked again.
-     * @param int course_category id to remove from `catstocheck`
+     * @param int $toremove the category id to remove from `catstocheck`
      */
     public function update_config($toremove) {
         $categories = get_config('syllabus', 'catstocheck');
@@ -71,6 +81,11 @@ class send_reminder_email extends \core\task\scheduled_task {
         set_config('catstocheck', implode(',', $allcats), 'syllabus');
     }
 
+    /**
+     * Get all of the courses in a category that need a reminder
+     * @param int $catid the id of the category to analyze
+     * @return array|null
+     */
     public function get_valid_courses($catid) {
         global $DB;
         mtrace("Finding courses in category id $catid to be processed.");
@@ -78,7 +93,7 @@ class send_reminder_email extends \core\task\scheduled_task {
         if (!$catid || !$DB->record_exists('course_categories', ['id' => $catid])) {
             mtrace("Category ID of $catid does not exist...skipping and removing from config.");
             $this->update_config($catid);
-            return;
+            return null;
         }
 
         $coursestoprocess = $DB->get_records('course', ['category' => $catid], '', 'id');
@@ -87,6 +102,11 @@ class send_reminder_email extends \core\task\scheduled_task {
         return $coursestoprocess;
     }
 
+    /**
+     * Process the courses, compiling a list of each instructor's
+     * courses that lack a Syllabus, then email them.
+     * @param array $courses list of courses without a Syllabus
+     */
     public function process_courses($courses) {
         global $OUTPUT;
 
@@ -130,8 +150,8 @@ class send_reminder_email extends \core\task\scheduled_task {
                             $coursestoprocess[$teacher->id][$course->shortname]['url'] = (string)
                                 new \moodle_url('/course/view.php', array('id' => $course->id));
                         } else {
-                    		mtrace("Skipping course $course->shortname because course is not visible to teacher.");
-						}
+                            mtrace("Skipping course $course->shortname because course is not visible to teacher.");
+                        }
                     }
                 }
             }
@@ -167,10 +187,10 @@ class send_reminder_email extends \core\task\scheduled_task {
         $admin = get_admin();
 
         $result = email_to_user($teacher, $admin,
-            get_string('emailsubj', 'mod_syllabus') . ' - ' . $datestr . ' - ' . $teacher->username, html_to_text($msg), $msg);
-		if (!$result) {
-			mtrace("Error emailing $teacher->firstname $teacher->lastname");
-		}
+                get_string('emailsubj', 'mod_syllabus') . ' - ' . $datestr . ' - ' . $teacher->username, html_to_text($msg), $msg);
+        if (!$result) {
+            mtrace("Error emailing $teacher->firstname $teacher->lastname");
+        }
     }
 
 }

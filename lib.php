@@ -15,12 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Part of the Syllabus module
  * @package    mod_syllabus
  * @copyright  2021 Marty Gilbert <martygilbert@gmail>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die;
 
 /**
  * List of features supported in Syllabus module
@@ -29,23 +28,32 @@ defined('MOODLE_INTERNAL') || die;
  */
 function syllabus_supports($feature) {
     switch($feature) {
-        case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_RESOURCE;
-        case FEATURE_GROUPS:                  return false;
-        case FEATURE_GROUPINGS:               return false;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        case FEATURE_GRADE_HAS_GRADE:         return false;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-        case FEATURE_SHOW_DESCRIPTION:        return true;
-
-        default: return null;
+        case FEATURE_MOD_ARCHETYPE:
+            return MOD_ARCHETYPE_RESOURCE;
+        case FEATURE_GROUPS:
+            return false;
+        case FEATURE_GROUPINGS:
+            return false;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
+        case FEATURE_GRADE_HAS_GRADE:
+            return false;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
+        default:
+            return null;
     }
 }
 
 /**
  * This function is used by the reset_course_userdata function in moodlelib.
- * @param $data the data submitted from the reset course.
+ * @param stdClass $data the data submitted from the reset course.
  * @return array status array
  */
 function syllabus_reset_userdata($data) {
@@ -205,7 +213,7 @@ function syllabus_delete_instance($id) {
  * "extra" information that may be needed when printing
  * this activity in a course listing.
  *
- * See {@link get_array_of_activities()} in course/lib.php
+ * See get_array_of_activities() in course/lib.php
  *
  * @param stdClass $coursemodule
  * @return cached_cm_info info
@@ -246,7 +254,8 @@ function syllabus_get_coursemodule_info($coursemodule) {
         $options = empty($syllabus->displayoptions) ? array() : unserialize($syllabus->displayoptions);
         $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
         $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
-        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
+        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,".
+            "copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
         $info->onclick = "window.open('$fullurl', '', '$wh'); return false;";
 
     } else if ($display == RESOURCELIB_DISPLAY_NEW) {
@@ -335,7 +344,7 @@ function syllabus_get_file_info($browser, $areas, $course, $cm, $context, $filea
 
         $urlbase = $CFG->wwwroot.'/pluginfile.php';
         if (!$storedfile = $fs->get_file($context->id, 'mod_syllabus', 'content', 0, $filepath, $filename)) {
-            if ($filepath === '/' and $filename === '.') {
+            if ($filepath === '/' && $filename === '.') {
                 $storedfile = new virtual_root_file($context->id, 'mod_syllabus', 'content', 0);
             } else {
                 // Not found.
@@ -417,7 +426,7 @@ function syllabus_pluginfile($course, $cm, $context, $filearea, $args, $forcedow
 
     // Should we apply filters?
     $mimetype = $file->get_mimetype();
-    if ($mimetype === 'text/html' or $mimetype === 'text/plain' or $mimetype === 'application/xhtml+xml') {
+    if ($mimetype === 'text/html' || $mimetype === 'text/plain' || $mimetype === 'application/xhtml+xml') {
         $filter = $DB->get_field('syllabus', 'filterfiles', array('id' => $cm->instance));
         $CFG->embeddedsoforcelinktarget = true;
     } else {
@@ -441,7 +450,8 @@ function syllabus_page_type_list($pagetype, $parentcontext, $currentcontext) {
 
 /**
  * Export file syllabus contents
- *
+ * @param stdClass $cm the course module
+ * @param string $baseurl the base URL
  * @return array of file content
  */
 function syllabus_export_contents($cm, $baseurl) {
@@ -528,6 +538,7 @@ function syllabus_check_updates_since(cm_info $cm, $from, $filter = array()) {
  *
  * @param calendar_event $event
  * @param \core_calendar\action_factory $factory
+ * @param int $userid the id of the user
  * @return \core_calendar\local\event\entities\action_interface|null
  */
 function mod_syllabus_core_calendar_provide_event_action(calendar_event $event,

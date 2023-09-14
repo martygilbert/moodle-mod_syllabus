@@ -23,7 +23,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/syllabus/backup/moodle2/backup_syllabus_stepslib.php');
 
@@ -51,8 +51,8 @@ class backup_syllabus_activity_task extends backup_activity_task {
      * @param string $content some HTML text that eventually contains URLs to the activity instance scripts
      * @return string the content with the URLs encoded
      */
-    static public function encode_content_links($content) {
-        global $CFG, $DB;
+    public static function encode_content_links($content) {
+        global $CFG;
 
         $base = preg_quote($CFG->wwwroot, "/");
 
@@ -62,8 +62,6 @@ class backup_syllabus_activity_task extends backup_activity_task {
 
         // Link to Syllabus view by moduleid.
         $search = "/(".$base."\/mod\/syllabus\/view.php\?id\=)([0-9]+)/";
-        // Link to syllabus view by recordid.
-        $search2 = "/(".$base."\/mod\/syllabus\/view.php\?r\=)([0-9]+)/";
 
         $content = preg_replace($search, '$@SYLLABUSVIEWBYID*$2@$', $content);
 

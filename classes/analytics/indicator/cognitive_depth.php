@@ -24,8 +24,6 @@
 
 namespace mod_syllabus\analytics\indicator;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Cognitive depth indicator - syllabus.
  *
@@ -46,10 +44,19 @@ class cognitive_depth extends activity_base {
         return new \lang_string('indicator:cognitivedepth', 'mod_syllabus');
     }
 
+    /**
+     * Returns the type
+     * @return const string
+     */
     public function get_indicator_type() {
         return self::INDICATOR_COGNITIVE;
     }
 
+    /**
+     * Returns the level
+     * @param \cm_info $cm the course module info
+     * @return const int
+     */
     public function get_cognitive_depth_level(\cm_info $cm) {
         return self::COGNITIVE_LEVEL_1;
     }

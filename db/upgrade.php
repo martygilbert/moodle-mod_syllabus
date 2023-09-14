@@ -42,8 +42,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
-
+/**
+ * Process a DB upgrade.
+ * @param int $oldversion the oldversion
+ */
 function xmldb_syllabus_upgrade($oldversion) {
     global $CFG;
 

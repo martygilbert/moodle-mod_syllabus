@@ -149,6 +149,11 @@ EOF;
 
 /**
  * Internal function - create click to open text with link.
+ * Unsure of some of the parameter values.
+ * @param stored_file $file main file
+ * @param string $revision from the Syllabus object
+ * @param string $extra options to the <a> tag
+ * @return string
  */
 function syllabus_get_clicktoopen($file, $revision, $extra='') {
     global $CFG;
@@ -164,6 +169,9 @@ function syllabus_get_clicktoopen($file, $revision, $extra='') {
 
 /**
  * Internal function - create click to open text with link.
+ * @param stored_file $file object
+ * @param string $revision from the Syllabus object
+ * @return string
  */
 function syllabus_get_clicktodownload($file, $revision) {
     global $CFG;
@@ -202,7 +210,8 @@ function syllabus_print_workaround($syllabus, $cm, $course, $file) {
             $options = empty($syllabus->displayoptions) ? array() : unserialize($syllabus->displayoptions);
             $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
             $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
-            $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
+            $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,".
+                "copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
             $extra = "onclick=\"window.open('$fullurl', '', '$wh'); return false;\"";
             echo syllabus_get_clicktoopen($file, $syllabus->revision, $extra);
             break;
@@ -258,7 +267,7 @@ function syllabus_print_heading($syllabus, $cm, $course, $notused = false) {
 
 
 /**
- * Gets details of the file to cache in course cache to be displayed using {@link syllabus_get_optional_details()}
+ * Gets details of the file to cache in course cache to be displayed using syllabus_get_optional_details()
  *
  * @param object $syllabus Resource table row (only property 'displayoptions' is used here)
  * @param object $cm Course-module table row
@@ -468,20 +477,33 @@ function syllabus_get_final_display_type($syllabus) {
  * File browsing support class
  */
 class syllabus_content_file_info extends file_info_stored {
+    /**
+     * Returns parent file_info instance
+     * @return file_info or null for root
+     */
     public function get_parent() {
-        if ($this->lf->get_filepath() === '/' and $this->lf->get_filename() === '.') {
+        if ($this->lf->get_filepath() === '/' && $this->lf->get_filename() === '.') {
             return $this->browser->get_file_info($this->context);
         }
         return parent::get_parent();
     }
+
+    /**
+     * Returns localised visible name.
+     * @return string
+     */
     public function get_visible_name() {
-        if ($this->lf->get_filepath() === '/' and $this->lf->get_filename() === '.') {
+        if ($this->lf->get_filepath() === '/' && $this->lf->get_filename() === '.') {
             return $this->topvisiblename;
         }
         return parent::get_visible_name();
     }
 }
 
+/**
+ * Set the Syllabus main file
+ * @param stdClass $data the data needed to set the main file
+ */
 function syllabus_set_mainfile($data) {
     global $DB;
     $fs = get_file_storage();
