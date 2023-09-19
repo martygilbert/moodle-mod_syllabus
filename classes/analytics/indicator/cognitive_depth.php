@@ -54,7 +54,7 @@ class cognitive_depth extends activity_base {
 
     /**
      * Returns the level
-     * @param stdClass|cm_info $cm the course module info
+     * @param stdClass|\cm_info $cm the course module info
      * @return const int
      */
     public function get_cognitive_depth_level(\cm_info $cm) {

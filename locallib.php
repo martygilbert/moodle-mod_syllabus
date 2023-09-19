@@ -502,6 +502,7 @@ class syllabus_content_file_info extends file_info_stored {
 
 /**
  * Set the Syllabus main file
+ * @param stdClass $data the data needed to set the main file
  */
 function syllabus_set_mainfile($data) {
     global $DB;

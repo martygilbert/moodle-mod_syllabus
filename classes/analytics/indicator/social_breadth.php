@@ -54,8 +54,8 @@ class social_breadth extends activity_base {
 
     /**
      * Get the social breadth level
-     * @param stdClass|cm_info $cm the course module info
-     * @returns const int
+     * @param stdClass|\cm_info $cm the course module info
+     * @return const int
      */
     public function get_social_breadth_level(\cm_info $cm) {
         return self::SOCIAL_LEVEL_1;

@@ -93,6 +93,7 @@ class lib_test extends \advanced_testcase {
      * Tests the syllabus_get_coursemodule_info function.
      *
      * Note: This currently doesn't test every aspect of the function, mainly focusing on the icon.
+     * @covers \syllabus::syllabus_et_coursemodule_info
      */
     public function test_get_coursemodule_info() {
         global $DB, $USER;
