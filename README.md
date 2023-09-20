@@ -1,4 +1,4 @@
-# Moodle Syllabus Activity [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+# Moodle Syllabus Activity [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![example workflow](https://github.com/martygilbert/moodle-mod_syllabus/actions/workflows/syllabus-ci.yml/badge.svg)
 This is a fork of the 'file' resource in Moodle that will allow instructors to upload their course syllabus.
 
 ## Motivation
