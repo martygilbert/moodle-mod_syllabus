@@ -74,7 +74,7 @@ class mobile {
         $thisfile->size         = $file->get_filesize();
 
         $data = array(
-            'issue'  => $thisfile,
+            'file'  => $thisfile,
         );
 
         return [
