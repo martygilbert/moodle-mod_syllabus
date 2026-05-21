@@ -25,10 +25,14 @@
  */
 
 use core_course\external\helper_for_get_mods_by_courses;
-
-defined('MOODLE_INTERNAL') || die;
-
-require_once("$CFG->libdir/externallib.php");
+use core_external\external_api;
+use core_external\external_files;
+use core_external\external_function_parameters;
+use core_external\external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_value;
+use core_external\external_warnings;
+use core_external\util;
 
 /**
  * Resource external functions
@@ -149,7 +153,7 @@ class mod_syllabus_external extends external_api {
         // Ensure there are courseids to loop through.
         if (!empty($params['courseids'])) {
 
-            list($courses, $warnings) = external_util::validate_courses($params['courseids'], $mycourses);
+            list($courses, $warnings) = util::validate_courses($params['courseids'], $mycourses);
 
             // Get the syllabi in this course, this function checks users visibility permissions.
             // We can avoid then additional validate_context calls.
@@ -158,7 +162,7 @@ class mod_syllabus_external extends external_api {
                 $context = context_module::instance($syllabus->coursemodule);
 
                 helper_for_get_mods_by_courses::format_name_and_intro($syllabus, 'mod_syllabus');
-                $syllabus->contentfiles = external_util::get_area_files($context->id, 'mod_syllabus', 'content');
+                $syllabus->contentfiles = util::get_area_files($context->id, 'mod_syllabus', 'content');
 
                 $returnedsyllabi[] = $syllabus;
             }
@@ -188,7 +192,7 @@ class mod_syllabus_external extends external_api {
                             'tobemigrated' => new external_value(PARAM_INT, 'Whether this syllabus was migrated'),
                             'legacyfiles' => new external_value(PARAM_INT, 'Legacy files flag'),
                             'legacyfileslast' => new external_value(PARAM_INT, 'Legacy files last control flag'),
-                            'display' => new external_value(PARAM_INT, 'How to display the syllabu'),
+                            'display' => new external_value(PARAM_INT, 'How to display the syllabi'),
                             'displayoptions' => new external_value(PARAM_RAW, 'Display options (width, height)'),
                             'filterfiles' => new external_value(PARAM_INT, 'If filters should be applied to the syllabus content'),
                             'revision' => new external_value(PARAM_INT, 'Incremented when after each file changes, to avoid cache'),

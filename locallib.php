@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+use core\url;
+
 require_once("$CFG->libdir/filelib.php");
 require_once("$CFG->libdir/resourcelib.php");
 require_once("$CFG->dirroot/mod/syllabus/lib.php");
@@ -118,8 +120,14 @@ function syllabus_display_frame($syllabus, $cm, $course, $file) {
     } else {
         $config = get_config('syllabus');
         $context = context_module::instance($cm->id);
-        $path = '/'.$context->id.'/mod_syllabus/content/'.$syllabus->revision.$file->get_filepath().$file->get_filename();
-        $fileurl = file_encode_url($CFG->wwwroot.'/pluginfile.php', $path, false);
+        $fileurl = moodle_url::make_pluginfile_url(
+            $context->id,
+            'mod_syllabus',
+            area: 'content',
+            itemid: $syllabus->revision,
+            pathname: $file->get_filepath(),
+            filename: $file->get_filename()
+        )->out();
         $navurl = "$CFG->wwwroot/mod/syllabus/view.php?id=$cm->id&amp;frameset=top";
         $title = strip_tags(format_string($course->shortname.': '.$syllabus->name));
         $framesize = $config->framesize;
@@ -159,8 +167,14 @@ function syllabus_get_clicktoopen($file, $revision, $extra='') {
     global $CFG;
 
     $filename = $file->get_filename();
-    $path = '/'.$file->get_contextid().'/mod_syllabus/content/'.$revision.$file->get_filepath().$file->get_filename();
-    $fullurl = file_encode_url($CFG->wwwroot.'/pluginfile.php', $path, false);
+    $fullurl = url::make_pluginfile_url(
+        contextid: $file->get_contextid(),
+        component: 'mod_syllabus',
+        area: 'content',
+        itemid: $revision,
+        pathname: $file->get_filepath(),
+        filename: $filename
+    )->out();
 
     $string = get_string('clicktoopen2', 'syllabus', "<a href=\"$fullurl\" $extra>$filename</a>");
 
@@ -177,8 +191,15 @@ function syllabus_get_clicktodownload($file, $revision) {
     global $CFG;
 
     $filename = $file->get_filename();
-    $path = '/'.$file->get_contextid().'/mod_syllabus/content/'.$revision.$file->get_filepath().$file->get_filename();
-    $fullurl = file_encode_url($CFG->wwwroot.'/pluginfile.php', $path, true);
+    $fullurl = url::make_pluginfile_url(
+        $file->get_contextid(),
+        'mod_syllabus',
+        'content',
+        $revision,
+        $file->get_filepath(),
+        $filename,
+        true
+    )->out();
 
     $string = get_string('clicktodownload', 'syllabus', "<a href=\"$fullurl\">$filename</a>");
 
@@ -204,9 +225,14 @@ function syllabus_print_workaround($syllabus, $cm, $course, $file) {
     echo '<div class="resourceworkaround">';
     switch (syllabus_get_final_display_type($syllabus)) {
         case RESOURCELIB_DISPLAY_POPUP:
-            $path = '/'.$file->get_contextid().'/mod_syllabus/content/'.$syllabus->revision.
-                $file->get_filepath().$file->get_filename();
-            $fullurl = file_encode_url($CFG->wwwroot.'/pluginfile.php', $path, false);
+            $fullurl = url::make_pluginfile_url(
+                contextid: $file->get_contextid(),
+                component: 'mod_syllabus',
+                area: 'content',
+                itemid: $resource->revision,
+                pathname: $file->get_filepath(),
+                filename: $file->get_filename()
+            )->out();
             $options = empty($syllabus->displayoptions) ? [] : unserialize($syllabus->displayoptions);
             $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
             $height = empty($options['popupheight']) ? 450 : $options['popupheight'];

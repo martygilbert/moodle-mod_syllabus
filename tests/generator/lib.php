@@ -22,6 +22,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Resource module data generator class.
  *
@@ -43,7 +45,7 @@ class mod_syllabus_generator extends testing_module_generator {
      * @return stdClass record from module-defined table with additional field
      *     cmid (corresponding id in course_modules table)
      */
-    public function create_instance($record = null, array $options = null) {
+    public function create_instance($record = null, ?array $options = null) {
         global $CFG, $USER;
         require_once($CFG->dirroot . '/lib/resourcelib.php');
         // Ensure the record can be modified without affecting calling code.
