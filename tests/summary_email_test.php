@@ -342,7 +342,7 @@ class summary_email_test extends \advanced_testcase {
 
         // Teacher A has 2 courses without a syllabus; teacher B has 1.
         list($course1, $teacherA, $student1) = $this->create_valid_course_with_teacher_student();
-        list($course2, $unusedteacher, $student2) = $this->create_valid_course_with_teacher_student(
+        list($course2, $teacherAref, $student2) = $this->create_valid_course_with_teacher_student(
             1, $teacherA->id
         );
         list($course3, $teacherB, $student3) = $this->create_valid_course_with_teacher_student();

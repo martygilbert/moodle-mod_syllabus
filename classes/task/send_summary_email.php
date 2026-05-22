@@ -88,7 +88,7 @@ class send_summary_email extends \core\task\scheduled_task {
 
         // Compute the top 10 teachers with the most courses missing a syllabus.
         uasort($allteachercounts, function($a, $b) {
-            return $b['count'] - $a['count'];
+            return $b['count'] <=> $a['count'];
         });
         $top10teachers = array_slice(array_values($allteachercounts), 0, 10);
 
