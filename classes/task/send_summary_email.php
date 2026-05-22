@@ -94,7 +94,15 @@ class send_summary_email extends \core\task\scheduled_task {
         global $DB;
 
         if (!$catid || !$DB->record_exists('course_categories', ['id' => $catid])) {
-            mtrace("Category ID of $catid does not exist...skipping.");
+            mtrace("Category ID of $catid does not exist...skipping and removing from config.");
+
+            $categories = get_config('syllabus', 'catstocheck');
+            if (!empty($categories)) {
+                $allcats = array_filter(array_map('trim', explode(',', $categories)));
+                $allcats = array_values(array_diff($allcats, [(string)$catid]));
+                set_config('catstocheck', implode(',', $allcats), 'syllabus');
+            }
+
             return null;
         }
 
