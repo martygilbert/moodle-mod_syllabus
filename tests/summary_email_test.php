@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_syllabus;
-
 /**
  * Unit tests for mod_syllabus send_summary_email task
  *

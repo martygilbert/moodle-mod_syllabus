@@ -28,7 +28,6 @@ namespace mod_syllabus\task;
  * eligible courses that do not have a Syllabus activity.
  */
 class send_summary_email extends \core\task\scheduled_task {
-
     /**
      * Returns the name of this task.
      * @return string
