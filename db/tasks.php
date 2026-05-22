@@ -34,4 +34,13 @@ $tasks = [
         'month'     => '*',
         'dayofweek' => '1',
     ],
+    [
+        'classname' => 'mod_syllabus\task\send_summary_email',
+        'blocking'  => 0,
+        'minute'    => 'R',
+        'hour'      => '3',
+        'day'       => '*',
+        'month'     => '*',
+        'dayofweek' => '1',
+    ],
 ];
