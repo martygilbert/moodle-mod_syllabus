@@ -16,14 +16,8 @@
 
 namespace mod_syllabus;
 
-use externallib_advanced_testcase;
+use core_external\external_api;
 use mod_syllabus_external;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-
-require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
 /**
  * External mod_syllabus functions unit tests
@@ -34,13 +28,13 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.5
  */
-class externallib_test extends externallib_advanced_testcase {
+final class externallib_test extends \core_external\tests\externallib_testcase {
 
     /**
      * Test view_syllabus
      * @covers \mod_syllabus_external::view_syllabus
      */
-    public function test_view_syllabus() {
+    public function test_view_syllabus(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -78,7 +72,7 @@ class externallib_test extends externallib_advanced_testcase {
         $sink = $this->redirectEvents();
 
         $result = mod_syllabus_external::view_syllabus($syllabus->id);
-        $result = \external_api::clean_returnvalue(mod_syllabus_external::view_syllabus_returns(), $result);
+        $result = external_api::clean_returnvalue(mod_syllabus_external::view_syllabus_returns(), $result);
 
         $events = $sink->get_events();
         $this->assertCount(1, $events);
@@ -112,7 +106,7 @@ class externallib_test extends externallib_advanced_testcase {
      * Test test_mod_syllabus_get_syllabus_by_courses
      * @covers \mod_syllabus_external::get_syllabus_by_courses
      */
-    public function test_mod_syllabus_get_syllabus_by_courses() {
+    public function test_mod_syllabus_get_syllabus_by_courses(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -150,9 +144,15 @@ class externallib_test extends externallib_advanced_testcase {
         $returndescription = mod_syllabus_external::get_syllabus_by_courses_returns();
 
         // Create what we expect to be returned when querying the two courses.
+        //$expectedfields = ['id', 'coursemodule', 'course', 'name', 'intro', 'introformat', 'introfiles', 'lang',
+                                //'contentfiles', 'tobemigrated', 'legacyfiles', 'legacyfileslast', 'display', 'displayoptions',
+                                //'filterfiles', 'revision', 'timemodified', 'section', 'visible', 'groupmode', 'groupingid'];
+
         $expectedfields = ['id', 'coursemodule', 'course', 'name', 'intro', 'introformat', 'introfiles', 'lang',
                                 'contentfiles', 'tobemigrated', 'legacyfiles', 'legacyfileslast', 'display', 'displayoptions',
-                                'filterfiles', 'revision', 'timemodified', 'section', 'visible', 'groupmode', 'groupingid'];
+                                'filterfiles', 'revision', 'timemodified', 'section', 'visible', 'groupmode', 'groupingid',
+                                'enableaitools', 'enabledaiactions'];
+
 
         // Add expected coursemodule and data.
         $syllabus1->coursemodule = $syllabus1->cmid;
@@ -165,6 +165,8 @@ class externallib_test extends externallib_advanced_testcase {
         $syllabus1->introfiles = [];
         $syllabus1->contentfiles = [];
         $syllabus1->lang = '';
+        $syllabus1->enableaitools = null;
+        $syllabus1->enabledaiactions = null;
 
         $syllabus2->coursemodule = $syllabus2->cmid;
         $syllabus2->introformat = 1;
@@ -176,6 +178,8 @@ class externallib_test extends externallib_advanced_testcase {
         $syllabus2->introfiles = [];
         $syllabus2->contentfiles = [];
         $syllabus2->lang = '';
+        $syllabus2->enableaitools = null;
+        $syllabus2->enabledaiactions = null;
 
         foreach ($expectedfields as $field) {
             $expected1[$field] = $syllabus1->{$field};
@@ -186,7 +190,7 @@ class externallib_test extends externallib_advanced_testcase {
 
         // Call the external function passing course ids.
         $result = mod_syllabus_external::get_syllabus_by_courses([$course2->id, $course1->id]);
-        $result = \external_api::clean_returnvalue($returndescription, $result);
+        $result = external_api::clean_returnvalue($returndescription, $result);
 
         // Remove the contentfiles (to be checked bellow).
         $result['syllabus'][0]['contentfiles'] = [];
@@ -198,7 +202,7 @@ class externallib_test extends externallib_advanced_testcase {
 
         // Call the external function without passing course id.
         $result = mod_syllabus_external::get_syllabus_by_courses();
-        $result = \external_api::clean_returnvalue($returndescription, $result);
+        $result = external_api::clean_returnvalue($returndescription, $result);
 
         // Remove the contentfiles (to be checked bellow).
         $result['syllabus'][0]['contentfiles'] = [];
@@ -223,7 +227,7 @@ class externallib_test extends externallib_advanced_testcase {
         $fs->create_file_from_string($filerecordinline, 'image contents (not really)');
 
         $result = mod_syllabus_external::get_syllabus_by_courses([$course2->id, $course1->id]);
-        $result = \external_api::clean_returnvalue($returndescription, $result);
+        $result = external_api::clean_returnvalue($returndescription, $result);
 
         // Check that we receive correctly the files.
         $this->assertCount(1, $result['syllabus'][0]['introfiles']);
@@ -240,7 +244,7 @@ class externallib_test extends externallib_advanced_testcase {
 
         // Call the external function without passing course id.
         $result = mod_syllabus_external::get_syllabus_by_courses();
-        $result = \external_api::clean_returnvalue($returndescription, $result);
+        $result = external_api::clean_returnvalue($returndescription, $result);
 
         // Remove the contentfiles (to be checked bellow).
         $result['syllabus'][0]['contentfiles'] = [];

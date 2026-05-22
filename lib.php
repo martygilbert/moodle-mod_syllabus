@@ -243,7 +243,7 @@ function syllabus_get_coursemodule_info($coursemodule) {
     $files = $fs->get_area_files($context->id, 'mod_syllabus', 'content', 0, 'sortorder DESC, id ASC', false, 0, 0, 1);
     if (count($files) >= 1) {
         $mainfile = reset($files);
-        $info->icon = file_file_icon($mainfile, 24);
+        $info->icon = file_file_icon($mainfile);
         $syllabus->mainfile = $mainfile->get_filename();
     }
 
