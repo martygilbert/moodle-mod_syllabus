@@ -33,29 +33,52 @@
         "categories": [
             {
                 "catname": "Category 1",
+                "eligible": 8,
                 "withsyllabus": 5,
-                "withoutsyllabus": 3,
-                "courses": [
-                    {
-                        "name": "Course 1",
-                        "url": "http://example.com/course/view.php?id=1",
-                        "teachernames": "John Doe, Jane Smith"
-                    }
-                ]
+                "withoutsyllabus": 3
             }
-        ]
+        ],
+        "top10teachers": [
+            {
+                "name": "Jane Smith",
+                "count": 3
+            },
+            {
+                "name": "John Doe",
+                "count": 1
+            }
+        ],
+        "hastop10": true
     }
 }}
 <p>{{#str}}summaryemailintro, mod_syllabus, {{datestr}}{{/str}}</p>
 
+<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;">
+<thead>
+<tr>
+    <th align="left">{{#str}}summaryemailcategory, mod_syllabus{{/str}}</th>
+    <th align="right">{{#str}}summaryemaileligible, mod_syllabus{{/str}}</th>
+    <th align="right">{{#str}}summaryemailwith, mod_syllabus{{/str}}</th>
+    <th align="right">{{#str}}summaryemailwithout, mod_syllabus{{/str}}</th>
+</tr>
+</thead>
+<tbody>
 {{#categories}}
-<h3>{{catname}}</h3>
-<p>{{#str}}summaryemailwith, mod_syllabus{{/str}}: {{withsyllabus}} | {{#str}}summaryemailwithout, mod_syllabus{{/str}}: {{withoutsyllabus}}</p>
-{{#courses}}
-<p>
-    <strong><a href="{{url}}">{{name}}</a></strong><br>
-    {{#str}}summaryemailteachers, mod_syllabus{{/str}}: {{teachernames}}
-</p>
-{{/courses}}
-{{^courses}}<p>{{#str}}summaryemailnocourses, mod_syllabus{{/str}}</p>{{/courses}}
+<tr>
+    <td>{{catname}}</td>
+    <td align="right">{{eligible}}</td>
+    <td align="right">{{withsyllabus}}</td>
+    <td align="right">{{withoutsyllabus}}</td>
+</tr>
 {{/categories}}
+</tbody>
+</table>
+
+{{#hastop10}}
+<h3>{{#str}}summaryemailtop10heading, mod_syllabus{{/str}}</h3>
+<ol>
+{{#top10teachers}}
+<li>{{name}} &ndash; {{count}} {{#str}}summaryemailtop10courses, mod_syllabus{{/str}}</li>
+{{/top10teachers}}
+</ol>
+{{/hastop10}}

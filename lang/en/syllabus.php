@@ -165,10 +165,12 @@ $string['configsummaryemails'] = 'Comma-separated list of email addresses to rec
 $string['summaryemail'] = 'Send weekly summary of missing syllabi';
 $string['summaryemailsubj'] = 'Syllabus Summary Report';
 $string['summaryemailintro'] = 'The following is a summary of eligible courses that do not have a syllabus posted as of {$a}.';
+$string['summaryemailcategory'] = 'Category';
+$string['summaryemaileligible'] = 'Eligible courses';
 $string['summaryemailwith'] = 'With syllabus';
 $string['summaryemailwithout'] = 'Without syllabus';
-$string['summaryemailteachers'] = 'Instructor(s)';
-$string['summaryemailnocourses'] = 'All eligible courses have a syllabus posted.';
+$string['summaryemailtop10heading'] = 'Top 10 instructors with missing syllabi';
+$string['summaryemailtop10courses'] = 'course(s) without a syllabus';
 
 // For CLI scripts.
 $string['clicatidnotfound'] = 'Error. Category id {$a} does not exist. Exiting.';

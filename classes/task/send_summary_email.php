@@ -60,6 +60,7 @@ class send_summary_email extends \core\task\scheduled_task {
 
         $cats = explode(',', $cats);
         $catdata = [];
+        $allteachercounts = [];
 
         foreach ($cats as $catid) {
             $catid = trim($catid);
@@ -68,6 +69,14 @@ class send_summary_email extends \core\task\scheduled_task {
             }
             $info = $this->get_category_data($catid);
             if ($info !== null) {
+                // Aggregate teacher counts across all categories.
+                foreach ($info['teachercounts'] as $tid => $tinfo) {
+                    if (!isset($allteachercounts[$tid])) {
+                        $allteachercounts[$tid] = ['name' => $tinfo['name'], 'count' => 0];
+                    }
+                    $allteachercounts[$tid]['count'] += $tinfo['count'];
+                }
+                unset($info['teachercounts']);
                 $catdata[] = $info;
             }
         }
@@ -77,18 +86,29 @@ class send_summary_email extends \core\task\scheduled_task {
             return;
         }
 
-        $this->send_summary_emails($catdata, $emails);
+        // Compute the top 10 teachers with the most courses missing a syllabus.
+        uasort($allteachercounts, function($a, $b) {
+            return $b['count'] - $a['count'];
+        });
+        $top10teachers = array_slice(array_values($allteachercounts), 0, 10);
+
+        $this->send_summary_emails($catdata, $top10teachers, $emails);
     }
 
     /**
-     * Build summary data for a single category: counts courses with/without
-     * a syllabus and lists courses without a syllabus along with their teachers.
+     * Build summary data for a single category: total eligible course count,
+     * courses with/without a syllabus, and per-teacher missing-syllabus counts
+     * (used to compile the global top-10 list).
+     *
+     * Categories with zero eligible courses are skipped (returns null) so that
+     * parent/container categories with no direct courses are omitted from the email.
      *
      * The same filtering rules used by the reminder email task are applied
      * (exclude regex, student enrolment, active date range, visibility).
      *
      * @param int $catid The course category id.
-     * @return array|null Summary data for the category, or null if category does not exist.
+     * @return array|null Summary data for the category, or null if category does not exist
+     *                    or has no eligible courses.
      */
     public function get_category_data($catid) {
         global $DB;
@@ -114,8 +134,9 @@ class send_summary_email extends \core\task\scheduled_task {
 
         $courseids = array_keys($DB->get_records('course', ['category' => $catid], '', 'id'));
 
-        $withsyllabus        = 0;
-        $courseswithoutsyllabus = [];
+        $withsyllabus    = 0;
+        $withoutsyllabus = 0;
+        $teachercounts   = [];
 
         foreach ($courseids as $courseid) {
             $course = get_course($courseid);
@@ -148,51 +169,63 @@ class send_summary_email extends \core\task\scheduled_task {
             if (count($syllabi) > 0) {
                 $withsyllabus++;
             } else {
-                // Collect teachers who can actually see this course.
+                $withoutsyllabus++;
+
+                // Tally this course against each teacher for the top-10 list.
                 $teachers = get_users_by_capability(
                     $coursecon,
                     'mod/syllabus:addinstance',
                     'u.id, u.firstname, u.lastname'
                 );
 
-                $teachernames = [];
                 foreach ($teachers as $teacher) {
                     if (has_capability('moodle/course:viewhiddencourses', $coursecon, $teacher->id)) {
-                        $teachernames[] = fullname($teacher);
+                        if (!isset($teachercounts[$teacher->id])) {
+                            $teachercounts[$teacher->id] = [
+                                'name'  => fullname($teacher),
+                                'count' => 0,
+                            ];
+                        }
+                        $teachercounts[$teacher->id]['count']++;
                     }
                 }
-
-                $courseswithoutsyllabus[] = [
-                    'name'         => $course->fullname,
-                    'url'          => (string) new \moodle_url('/course/view.php', ['id' => $course->id]),
-                    'teachernames' => implode(', ', $teachernames),
-                ];
             }
+        }
+
+        $eligible = $withsyllabus + $withoutsyllabus;
+
+        // Skip categories with no eligible courses (e.g. empty parent categories).
+        if ($eligible === 0) {
+            return null;
         }
 
         return [
             'catname'         => $category->name,
+            'eligible'        => $eligible,
             'withsyllabus'    => $withsyllabus,
-            'withoutsyllabus' => count($courseswithoutsyllabus),
-            'courses'         => $courseswithoutsyllabus,
+            'withoutsyllabus' => $withoutsyllabus,
+            'teachercounts'   => $teachercounts,
         ];
     }
 
     /**
      * Render the summary email template and send it to each configured address.
      *
-     * @param array  $catdata  Array of category summary data produced by get_category_data().
-     * @param string $emails   Comma-separated list of recipient email addresses.
+     * @param array  $catdata       Array of category summary data produced by get_category_data().
+     * @param array  $top10teachers Ranked list of up to 10 teachers with the most missing syllabi.
+     * @param string $emails        Comma-separated list of recipient email addresses.
      */
-    public function send_summary_emails($catdata, $emails) {
+    public function send_summary_emails($catdata, $top10teachers, $emails) {
         global $OUTPUT;
 
         $now     = time();
         $datestr = userdate($now, get_string('strftimedatefullshort', 'core_langconfig'));
 
         $data = [
-            'datestr'    => $datestr,
-            'categories' => $catdata,
+            'datestr'      => $datestr,
+            'categories'   => $catdata,
+            'top10teachers' => $top10teachers,
+            'hastop10'     => !empty($top10teachers),
         ];
 
         $msg     = $OUTPUT->render_from_template('mod_syllabus/email_summary', $data);

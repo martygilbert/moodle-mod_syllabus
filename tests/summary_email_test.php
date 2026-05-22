@@ -149,7 +149,7 @@ class summary_email_test extends \advanced_testcase {
     }
 
     /**
-     * Make sure the summary email body includes the course name for a course without a syllabus.
+     * Make sure the summary email body contains the instructor name for a course without a syllabus.
      * @covers \mod_syllabus\task\send_summary_email
      */
     public function test_summary_email_includes_course_without_syllabus() {
@@ -164,7 +164,8 @@ class summary_email_test extends \advanced_testcase {
         $messages = $this->mailsink->get_messages();
 
         $this->assertEquals(1, count($messages));
-        $this->assertMatchesRegularExpression('/' . $course->fullname . '/', $messages[0]->body);
+        // The teacher's name should appear in the top-10 section of the email body.
+        $this->assertMatchesRegularExpression('/' . preg_quote(fullname($teacher), '/') . '/', $messages[0]->body);
     }
 
     /**
@@ -189,9 +190,10 @@ class summary_email_test extends \advanced_testcase {
         $task = new \mod_syllabus\task\send_summary_email();
         $info = $task->get_category_data($course->category);
 
+        $this->assertEquals(1, $info['eligible']);
         $this->assertEquals(1, $info['withsyllabus']);
         $this->assertEquals(0, $info['withoutsyllabus']);
-        $this->assertEmpty($info['courses']);
+        $this->assertEmpty($info['teachercounts']);
     }
 
     /**
@@ -219,10 +221,11 @@ class summary_email_test extends \advanced_testcase {
         $task = new \mod_syllabus\task\send_summary_email();
         $info = $task->get_category_data($course1->category);
 
+        $this->assertEquals(2, $info['eligible']);
         $this->assertEquals(1, $info['withsyllabus']);
         $this->assertEquals(1, $info['withoutsyllabus']);
-        $this->assertCount(1, $info['courses']);
-        $this->assertEquals($course2->fullname, $info['courses'][0]['name']);
+        // Teacher 2's name should appear in the teacher counts for this category.
+        $this->assertNotEmpty($info['teachercounts']);
     }
 
     /**
@@ -243,6 +246,7 @@ class summary_email_test extends \advanced_testcase {
 
     /**
      * Make sure courses with no enrolled students are not included in the summary.
+     * When all courses in a category are ineligible the method should return null.
      * @covers \mod_syllabus\task\send_summary_email::get_category_data
      */
     public function test_summary_excludes_courses_without_students() {
@@ -253,14 +257,14 @@ class summary_email_test extends \advanced_testcase {
         $task = new \mod_syllabus\task\send_summary_email();
         $info = $task->get_category_data($course->category);
 
-        // No students – the course should not appear anywhere in the summary.
-        $this->assertEquals(0, $info['withsyllabus']);
-        $this->assertEquals(0, $info['withoutsyllabus']);
-        $this->assertEmpty($info['courses']);
+        // No students – no eligible courses – category should be skipped entirely.
+        $this->assertNull($info);
     }
 
     /**
      * Make sure hidden courses are excluded from the summary when emailstohidden is false.
+     * When all courses are hidden and emailstohidden is off, the category has no eligible
+     * courses and get_category_data should return null.
      * @covers \mod_syllabus\task\send_summary_email::get_category_data
      */
     public function test_summary_excludes_hidden_courses_when_not_configured() {
@@ -272,9 +276,8 @@ class summary_email_test extends \advanced_testcase {
         $task = new \mod_syllabus\task\send_summary_email();
         $info = $task->get_category_data($course->category);
 
-        $this->assertEquals(0, $info['withsyllabus']);
-        $this->assertEquals(0, $info['withoutsyllabus']);
-        $this->assertEmpty($info['courses']);
+        // Hidden course excluded and no eligible courses remain – category is skipped.
+        $this->assertNull($info);
     }
 
     /**
@@ -290,13 +293,15 @@ class summary_email_test extends \advanced_testcase {
         $task = new \mod_syllabus\task\send_summary_email();
         $info = $task->get_category_data($course->category);
 
+        $this->assertEquals(1, $info['eligible']);
         $this->assertEquals(0, $info['withsyllabus']);
         $this->assertEquals(1, $info['withoutsyllabus']);
-        $this->assertCount(1, $info['courses']);
     }
 
     /**
      * Make sure courses matching the excluderegex are skipped.
+     * When all courses are excluded the category has no eligible courses and
+     * get_category_data should return null.
      * @covers \mod_syllabus\task\send_summary_email::get_category_data
      */
     public function test_summary_excluderegex() {
@@ -310,9 +315,8 @@ class summary_email_test extends \advanced_testcase {
         $task = new \mod_syllabus\task\send_summary_email();
         $info = $task->get_category_data($course->category);
 
-        $this->assertEquals(0, $info['withsyllabus']);
-        $this->assertEquals(0, $info['withoutsyllabus']);
-        $this->assertEmpty($info['courses']);
+        // All courses excluded – category is skipped.
+        $this->assertNull($info);
     }
 
     /**
@@ -326,6 +330,45 @@ class summary_email_test extends \advanced_testcase {
         $info = $task->get_category_data(99999);
 
         $this->assertNull($info);
+    }
+
+    /**
+     * Make sure the top-10 teachers list in the email is ranked by course count.
+     * @covers \mod_syllabus\task\send_summary_email
+     */
+    public function test_summary_top10_teachers_ordered() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        // Teacher A has 2 courses without a syllabus; teacher B has 1.
+        list($course1, $teacherA, $student1) = $this->create_valid_course_with_teacher_student();
+        list($course2, $unusedteacher, $student2) = $this->create_valid_course_with_teacher_student(
+            1, $teacherA->id
+        );
+        list($course3, $teacherB, $student3) = $this->create_valid_course_with_teacher_student();
+
+        // Move all courses into the same category.
+        $course2->category = $course1->category;
+        $course3->category = $course1->category;
+        $DB->update_record('course', $course2);
+        $DB->update_record('course', $course3);
+
+        set_config('catstocheck', $course1->category, 'syllabus');
+        set_config('summaryenabled', '1', 'syllabus');
+        set_config('summaryemails', 'admin@example.com', 'syllabus');
+
+        $this->execute_task();
+        $messages = $this->mailsink->get_messages();
+
+        $this->assertEquals(1, count($messages));
+        $body = $messages[0]->body;
+
+        // Teacher A's name must appear before teacher B's name in the email.
+        $posA = strpos($body, fullname($teacherA));
+        $posB = strpos($body, fullname($teacherB));
+        $this->assertNotFalse($posA, 'Teacher A not found in email body');
+        $this->assertNotFalse($posB, 'Teacher B not found in email body');
+        $this->assertLessThan($posB, $posA, 'Teacher A should appear before Teacher B');
     }
 
     // -------------------------------------------------------------------------
