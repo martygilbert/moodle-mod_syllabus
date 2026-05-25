@@ -7,9 +7,9 @@ Our institution had many different methods of collecting course syllabi for accr
 ## Installation
 From your Moodle installation's `/mod` directory:
 ```
-git clone -b SYLLABUS_401_STABLE git@github.com:martygilbert/moodle-mod_syllabus.git syllabus
+git clone -b SYLLABUS_501_STABLE git@github.com:martygilbert/moodle-mod_syllabus.git syllabus
 ```
-You can replace `SYLLABUS_401_STABLE` with the branch that best matches your installation.
+You can replace `SYLLABUS_501_STABLE` with the branch that best matches your installation.
 ## Usage
 Instructors can upload a single file using the Syllabus activity. By turning on 'Enable reminder emails' and selecting some categories in 'Categories to check' in the Syllabus site settings, reminder emails will be sent to the instructors of the courses that don't currently have a Syllabus activity.
 

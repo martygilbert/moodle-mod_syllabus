@@ -46,6 +46,14 @@ class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Test syllabus_supports.
+     * @covers ::syllabus_supports
+     */
+    public function test_syllabus_supports() {
+        $this->assertSame(MOD_PURPOSE_CONTENT, syllabus_supports(FEATURE_MOD_PURPOSE));
+    }
+
+    /**
      * Test syllabus_view
      * @covers \syllabus::syllabus_view
      * @return void
