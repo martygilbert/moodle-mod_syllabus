@@ -170,7 +170,11 @@ class summary_email_test extends \advanced_testcase {
 
         $this->assertEquals(1, count($messages));
         // The teacher's name should appear in the top-10 section of the email body.
-        $this->assertMatchesRegularExpression('/' . preg_quote(fullname($teacher), '/') . '/', $messages[0]->body);
+        // The raw MIME body may be quoted-printable encoded, so decode before matching.
+        $this->assertMatchesRegularExpression(
+            '/' . preg_quote(fullname($teacher), '/') . '/',
+            quoted_printable_decode($messages[0]->body)
+        );
     }
 
     /**
@@ -333,7 +337,9 @@ class summary_email_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         $task = new \mod_syllabus\task\send_summary_email();
+        ob_start();
         $info = $task->get_category_data(99999);
+        ob_end_clean();
 
         $this->assertNull($info);
     }
@@ -367,7 +373,8 @@ class summary_email_test extends \advanced_testcase {
         $messages = $this->mailsink->get_messages();
 
         $this->assertEquals(1, count($messages));
-        $body = $messages[0]->body;
+        // The raw MIME body may be quoted-printable encoded, so decode before searching.
+        $body = quoted_printable_decode($messages[0]->body);
 
         // Teacher A's name must appear before teacher B's name in the email.
         $posA = strpos($body, fullname($teacherA));
