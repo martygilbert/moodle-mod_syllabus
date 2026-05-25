@@ -53,22 +53,22 @@
 }}
 <p>{{#str}}summaryemailintro, mod_syllabus, {{datestr}}{{/str}}</p>
 
-<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;">
+<table style="border-collapse:collapse;border:1px solid #ccc;">
 <thead>
 <tr>
-    <th align="left">{{#str}}summaryemailcategory, mod_syllabus{{/str}}</th>
-    <th align="right">{{#str}}summaryemaileligible, mod_syllabus{{/str}}</th>
-    <th align="right">{{#str}}summaryemailwith, mod_syllabus{{/str}}</th>
-    <th align="right">{{#str}}summaryemailwithout, mod_syllabus{{/str}}</th>
+    <th style="text-align:left;padding:5px;border:1px solid #ccc;">{{#str}}summaryemailcategory, mod_syllabus{{/str}}</th>
+    <th style="text-align:right;padding:5px;border:1px solid #ccc;">{{#str}}summaryemaileligible, mod_syllabus{{/str}}</th>
+    <th style="text-align:right;padding:5px;border:1px solid #ccc;">{{#str}}summaryemailwith, mod_syllabus{{/str}}</th>
+    <th style="text-align:right;padding:5px;border:1px solid #ccc;">{{#str}}summaryemailwithout, mod_syllabus{{/str}}</th>
 </tr>
 </thead>
 <tbody>
 {{#categories}}
 <tr>
-    <td>{{catname}}</td>
-    <td align="right">{{eligible}}</td>
-    <td align="right">{{withsyllabus}}</td>
-    <td align="right">{{withoutsyllabus}}</td>
+    <td style="padding:5px;border:1px solid #ccc;">{{catname}}</td>
+    <td style="text-align:right;padding:5px;border:1px solid #ccc;">{{eligible}}</td>
+    <td style="text-align:right;padding:5px;border:1px solid #ccc;">{{withsyllabus}}</td>
+    <td style="text-align:right;padding:5px;border:1px solid #ccc;">{{withoutsyllabus}}</td>
 </tr>
 {{/categories}}
 </tbody>
