@@ -1,0 +1,84 @@
+{{!
+    This file is part of Moodle - http://moodle.org/                                                                                
+
+    Moodle is free software: you can redistribute it and/or modify                                                                  
+    it under the terms of the GNU General Public License as published by                                                            
+    the Free Software Foundation, either version 3 of the License, or                                                               
+    (at your option) any later version.                                                                                             
+
+    Moodle is distributed in the hope that it will be useful,                                                                       
+    but WITHOUT ANY WARRANTY; without even the implied warranty of                                                                  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                                                   
+    GNU General Public License for more details.                                                                                    
+
+    You should have received a copy of the GNU General Public License                                                               
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.       
+
+}}
+{{!
+    @template   mod_syllabus/email_summary
+    @copyright  Marty Gilbert <martygilbert@gmail>
+
+    Template for sending an admin summary of courses missing syllabi
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Example context (json):
+    {
+        "datestr": "May 22, 2024",
+        "categories": [
+            {
+                "catname": "Category 1",
+                "eligible": 8,
+                "withsyllabus": 5,
+                "withoutsyllabus": 3
+            }
+        ],
+        "top10teachers": [
+            {
+                "name": "Jane Smith",
+                "count": 3
+            },
+            {
+                "name": "John Doe",
+                "count": 1
+            }
+        ],
+        "hastop10": true
+    }
+}}
+<p>{{#str}}summaryemailintro, mod_syllabus, {{datestr}}{{/str}}</p>
+
+<table style="border-collapse:collapse;border:1px solid #ccc;">
+<thead>
+<tr>
+    <th style="text-align:left;padding:5px;border:1px solid #ccc;">{{#str}}summaryemailcategory, mod_syllabus{{/str}}</th>
+    <th style="text-align:right;padding:5px;border:1px solid #ccc;">{{#str}}summaryemaileligible, mod_syllabus{{/str}}</th>
+    <th style="text-align:right;padding:5px;border:1px solid #ccc;">{{#str}}summaryemailwith, mod_syllabus{{/str}}</th>
+    <th style="text-align:right;padding:5px;border:1px solid #ccc;">{{#str}}summaryemailwithout, mod_syllabus{{/str}}</th>
+</tr>
+</thead>
+<tbody>
+{{#categories}}
+<tr>
+    <td style="padding:5px;border:1px solid #ccc;">{{catname}}</td>
+    <td style="text-align:right;padding:5px;border:1px solid #ccc;">{{eligible}}</td>
+    <td style="text-align:right;padding:5px;border:1px solid #ccc;">{{withsyllabus}}</td>
+    <td style="text-align:right;padding:5px;border:1px solid #ccc;">{{withoutsyllabus}}</td>
+</tr>
+{{/categories}}
+</tbody>
+</table>
+
+{{#hastop10}}
+<h3>{{#str}}summaryemailtop10heading, mod_syllabus{{/str}}</h3>
+<ol>
+{{#top10teachers}}
+<li>{{name}} &ndash; {{count}} {{#str}}summaryemailtop10courses, mod_syllabus{{/str}}</li>
+{{/top10teachers}}
+</ol>
+{{/hastop10}}

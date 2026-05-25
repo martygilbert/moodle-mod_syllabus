@@ -155,6 +155,23 @@ $string['emailclosing'] = '<p>If you have any questions about the syllabus requi
 <p>Moodle Administrator<br>
 moodleadmin@mhu.edu</p>';
 
+// For summary emails.
+$string['tasksummaryemailsettings'] = 'Summary email task settings';
+$string['confsummaryemail'] = 'Settings that affect the summary email scheduled task';
+$string['enablesummary'] = 'Enable summary emails';
+$string['configenablesummary'] = 'If enabled, will send a weekly summary email listing eligible courses that do not have a Syllabus activity.';
+$string['summaryemails'] = 'Summary email recipients';
+$string['configsummaryemails'] = 'Comma-separated list of Moodle usernames to receive the weekly summary email.';
+$string['summaryemail'] = 'Send weekly summary of missing syllabi';
+$string['summaryemailsubj'] = 'Syllabus Summary Report';
+$string['summaryemailintro'] = 'The following is a summary of eligible courses that do not have a syllabus posted as of {$a}.';
+$string['summaryemailcategory'] = 'Category';
+$string['summaryemaileligible'] = 'Eligible courses';
+$string['summaryemailwith'] = 'With syllabus';
+$string['summaryemailwithout'] = 'Without syllabus';
+$string['summaryemailtop10heading'] = 'Top 10 instructors with missing syllabi';
+$string['summaryemailtop10courses'] = 'course(s) without a syllabus';
+
 // For CLI scripts.
 $string['clicatidnotfound'] = 'Error. Category id {$a} does not exist. Exiting.';
 $string['climissingrequiredarg'] = 'Missing required argument \'{$a}\'.';

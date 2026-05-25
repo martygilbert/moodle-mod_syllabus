@@ -66,6 +66,18 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configmultiselect('syllabus/catstocheck',
         get_string('catstocheck', 'syllabus'), get_string('configcatstocheck', 'syllabus'), [], $categories));
 
+    // Summary email task settings.
+    $settings->add(new admin_setting_heading('syllabusmodsummaryemail',
+        get_string('tasksummaryemailsettings', 'syllabus'), get_string('confsummaryemail', 'syllabus')));
+
+    // Summary email enabled?
+    $settings->add(new admin_setting_configcheckbox('syllabus/summaryenabled',
+        get_string('enablesummary', 'syllabus'), get_string('configenablesummary', 'syllabus'), 0));
+
+    // Summary email recipients.
+    $settings->add(new admin_setting_configtext('syllabus/summaryemails',
+        get_string('summaryemails', 'syllabus'), get_string('configsummaryemails', 'syllabus'), '', PARAM_RAW));
+
     // Link to HowTo Add A Syllabus documentation.
     $settings->add(new admin_setting_configtext('syllabus/addsyllabuslink',
         get_string('addsyllabuslink', 'syllabus'), get_string('configaddsyllabuslink', 'syllabus'), '', PARAM_URL));
