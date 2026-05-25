@@ -46,9 +46,9 @@ class send_summary_email extends \core\task\scheduled_task {
             return;
         }
 
-        $emails = get_config('syllabus', 'summaryemails');
-        if (empty(trim((string)$emails))) {
-            mtrace("Not sending summary email - no email addresses configured");
+        $usernames = get_config('syllabus', 'summaryemails');
+        if (empty(trim((string)$usernames))) {
+            mtrace("Not sending summary email - no usernames configured");
             return;
         }
 
@@ -92,7 +92,7 @@ class send_summary_email extends \core\task\scheduled_task {
         });
         $top10teachers = array_slice(array_values($allteachercounts), 0, 10);
 
-        $this->send_summary_emails($catdata, $top10teachers, $emails);
+        $this->send_summary_emails($catdata, $top10teachers, $usernames);
     }
 
     /**
@@ -209,13 +209,13 @@ class send_summary_email extends \core\task\scheduled_task {
     }
 
     /**
-     * Render the summary email template and send it to each configured address.
+     * Render the summary email template and send it to each configured Moodle user.
      *
      * @param array  $catdata       Array of category summary data produced by get_category_data().
      * @param array  $top10teachers Ranked list of up to 10 teachers with the most missing syllabi.
-     * @param string $emails        Comma-separated list of recipient email addresses.
+     * @param string $usernames     Comma-separated list of Moodle usernames to receive the email.
      */
-    public function send_summary_emails($catdata, $top10teachers, $emails) {
+    public function send_summary_emails($catdata, $top10teachers, $usernames) {
         global $OUTPUT;
 
         $now     = time();
@@ -231,36 +231,33 @@ class send_summary_email extends \core\task\scheduled_task {
         $msg     = $OUTPUT->render_from_template('mod_syllabus/email_summary', $data);
         $subject = get_string('summaryemailsubj', 'mod_syllabus') . ' - ' . $datestr;
 
-        $emaillist = array_filter(array_map('trim', explode(',', $emails)));
+        $usernamelist = array_filter(array_map('trim', explode(',', $usernames)));
 
-        foreach ($emaillist as $email) {
-            if (!validate_email($email)) {
-                mtrace("Invalid email address: $email - skipping.");
+        foreach ($usernamelist as $username) {
+            $user = \core_user::get_user_by_username($username);
+            if (!$user) {
+                mtrace("User with username '$username' not found - skipping.");
                 continue;
             }
 
-            $recipient = $this->make_recipient($email);
+            $recipient = $this->make_recipient($user);
             $admin     = get_admin();
 
-            mtrace("Sending summary email to $email");
+            mtrace("Sending summary email to $username ($user->email)");
             $result = email_to_user($recipient, $admin, $subject, html_to_text($msg), $msg);
             if (!$result) {
-                mtrace("Error sending summary email to $email");
+                mtrace("Error sending summary email to $username");
             }
         }
     }
 
     /**
-     * Build a minimal user object suitable for use as an email recipient.
+     * Return the Moodle user object to use as the email recipient.
      *
-     * @param  string    $email The recipient email address.
-     * @return \stdClass        A user-like object accepted by email_to_user().
+     * @param  \stdClass $user A Moodle user record.
+     * @return \stdClass       The same user object, suitable for email_to_user().
      */
-    public function make_recipient($email) {
-        $recipient            = clone \core_user::get_noreply_user();
-        $recipient->email     = $email;
-        $recipient->firstname = '';
-        $recipient->lastname  = '';
-        return $recipient;
+    public function make_recipient($user) {
+        return $user;
     }
 }

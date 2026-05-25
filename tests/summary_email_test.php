@@ -81,9 +81,10 @@ class summary_email_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         list($course, $teacher, $student) = $this->create_valid_course_with_teacher_student();
+        $admin = get_admin();
         set_config('catstocheck', $course->category, 'syllabus');
         set_config('summaryenabled', '0', 'syllabus');
-        set_config('summaryemails', 'admin@example.com', 'syllabus');
+        set_config('summaryemails', $admin->username, 'syllabus');
 
         $this->execute_task();
         $messages = $this->mailsink->get_messages();
@@ -108,16 +109,18 @@ class summary_email_test extends \advanced_testcase {
     }
 
     /**
-     * Make sure the summary task sends one email per configured address.
+     * Make sure the summary task sends one email per configured username.
      * @covers \mod_syllabus\task\send_summary_email
      */
     public function test_summary_sent_to_each_recipient() {
         $this->resetAfterTest(true);
 
         list($course, $teacher, $student) = $this->create_valid_course_with_teacher_student();
+        $admin  = get_admin();
+        $second = $this->getDataGenerator()->create_user();
         set_config('catstocheck', $course->category, 'syllabus');
         set_config('summaryenabled', '1', 'syllabus');
-        set_config('summaryemails', 'admin@example.com, second@example.com', 'syllabus');
+        set_config('summaryemails', $admin->username . ', ' . $second->username, 'syllabus');
 
         $this->execute_task();
         $messages = $this->mailsink->get_messages();
@@ -134,9 +137,10 @@ class summary_email_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         list($course, $teacher, $student) = $this->create_valid_course_with_teacher_student();
+        $admin = get_admin();
         set_config('catstocheck', $course->category, 'syllabus');
         set_config('summaryenabled', '1', 'syllabus');
-        set_config('summaryemails', 'admin@example.com', 'syllabus');
+        set_config('summaryemails', $admin->username, 'syllabus');
 
         $this->execute_task();
         $messages = $this->mailsink->get_messages();
@@ -156,9 +160,10 @@ class summary_email_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         list($course, $teacher, $student) = $this->create_valid_course_with_teacher_student();
+        $admin = get_admin();
         set_config('catstocheck', $course->category, 'syllabus');
         set_config('summaryenabled', '1', 'syllabus');
-        set_config('summaryemails', 'admin@example.com', 'syllabus');
+        set_config('summaryemails', $admin->username, 'syllabus');
 
         $this->execute_task();
         $messages = $this->mailsink->get_messages();
@@ -177,9 +182,10 @@ class summary_email_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         list($course, $teacher, $student) = $this->create_valid_course_with_teacher_student();
+        $admin = get_admin();
         set_config('catstocheck', $course->category, 'syllabus');
         set_config('summaryenabled', '1', 'syllabus');
-        set_config('summaryemails', 'admin@example.com', 'syllabus');
+        set_config('summaryemails', $admin->username, 'syllabus');
 
         // Add a Syllabus activity to the course.
         $this->setUser($teacher);
@@ -237,7 +243,7 @@ class summary_email_test extends \advanced_testcase {
 
         set_config('catstocheck', '', 'syllabus');
         set_config('summaryenabled', '1', 'syllabus');
-        set_config('summaryemails', 'admin@example.com', 'syllabus');
+        set_config('summaryemails', get_admin()->username, 'syllabus');
 
         $this->execute_task();
         $messages = $this->mailsink->get_messages();
@@ -355,7 +361,7 @@ class summary_email_test extends \advanced_testcase {
 
         set_config('catstocheck', $course1->category, 'syllabus');
         set_config('summaryenabled', '1', 'syllabus');
-        set_config('summaryemails', 'admin@example.com', 'syllabus');
+        set_config('summaryemails', get_admin()->username, 'syllabus');
 
         $this->execute_task();
         $messages = $this->mailsink->get_messages();
