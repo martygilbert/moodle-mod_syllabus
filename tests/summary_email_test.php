@@ -309,6 +309,37 @@ class summary_email_test extends \advanced_testcase {
     }
 
     /**
+     * Make sure a hidden course is NOT counted as "without a syllabus" when the
+     * teacher cannot view it (i.e. lacks moodle/course:viewhiddencourses).
+     * This mirrors the behaviour of send_reminder_email which skips such courses.
+     * @covers \mod_syllabus\task\send_summary_email::get_category_data
+     */
+    public function test_summary_hidden_course_invisible_to_teacher_not_counted() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        // Create a hidden course with a teacher and student.
+        list($course, $teacher, $student) = $this->create_valid_course_with_teacher_student(0);
+
+        // Configure the task to process hidden courses.
+        set_config('emailstohidden', '1', 'syllabus');
+
+        // Remove the viewhiddencourses capability from the editing teacher role
+        // in this course context – the teacher can no longer see the hidden course.
+        $coursecon = \context_course::instance($course->id);
+        $teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher']);
+        assign_capability('moodle/course:viewhiddencourses', CAP_PREVENT, $teacherroleid, $coursecon);
+
+        $task = new \mod_syllabus\task\send_summary_email();
+        $info = $task->get_category_data($course->category);
+
+        // The course is eligible (visible to the admin), but no teacher can see it,
+        // so it must NOT be included in withoutsyllabus and the category should be
+        // skipped entirely (null) because there are no countable eligible courses.
+        $this->assertNull($info);
+    }
+
+    /**
      * Make sure courses matching the excluderegex are skipped.
      * When all courses are excluded the category has no eligible courses and
      * get_category_data should return null.

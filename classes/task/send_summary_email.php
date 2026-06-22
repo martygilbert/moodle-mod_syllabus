@@ -169,17 +169,19 @@ class send_summary_email extends \core\task\scheduled_task {
             if (count($syllabi) > 0) {
                 $withsyllabus++;
             } else {
-                $withoutsyllabus++;
-
                 // Tally this course against each teacher for the top-10 list.
+                // Only count the course as missing a syllabus if at least one
+                // teacher can actually view it (mirrors send_reminder_email behaviour).
                 $teachers = get_users_by_capability(
                     $coursecon,
                     'mod/syllabus:addinstance',
                     'u.id, u.firstname, u.lastname'
                 );
 
+                $teachercanview = false;
                 foreach ($teachers as $teacher) {
                     if (has_capability('moodle/course:viewhiddencourses', $coursecon, $teacher->id)) {
+                        $teachercanview = true;
                         if (!isset($teachercounts[$teacher->id])) {
                             $teachercounts[$teacher->id] = [
                                 'name'  => fullname($teacher),
@@ -188,6 +190,10 @@ class send_summary_email extends \core\task\scheduled_task {
                         }
                         $teachercounts[$teacher->id]['count']++;
                     }
+                }
+
+                if ($teachercanview) {
+                    $withoutsyllabus++;
                 }
             }
         }
